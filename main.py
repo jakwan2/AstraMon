@@ -113,6 +113,8 @@ async def check_hunger(user_id):
     user_data = get_user_data(user_id)
     now = datetime.now()
     
+    monsters_to_remove = []
+    
     for monster in user_data["monsters"]:
         if "last_fed" not in monster:
             monster["last_fed"] = now.isoformat()
@@ -131,12 +133,15 @@ async def check_hunger(user_id):
                     pass
             
             if monster["hunger"] >= 100:
-                user_data["monsters"].remove(monster)
+                monsters_to_remove.append(monster)
                 try:
                     user = await bot.fetch_user(int(user_id))
                     await user.send(f"💔 Your {monster['emoji']} {monster['name']} has faded away from starvation... Rest in peace... 😢")
                 except:
                     pass
+    
+    for monster in monsters_to_remove:
+        user_data["monsters"].remove(monster)
     
     save_data(data)
 
@@ -183,7 +188,7 @@ async def catch(ctx):
     )
 
 @bot.command()
-async def feed(ctx, *, monster_name: str = None):
+async def feed(ctx, *, monster_name: str = ""):
     if not monster_name:
         await ctx.send("UwU, please specify which monster to feed! Example: `astramon feed Fire Pup`")
         return
@@ -236,7 +241,7 @@ async def shop(ctx):
     await ctx.send(embed=embed)
 
 @bot.command()
-async def evolve(ctx, *, monster_name: str = None):
+async def evolve(ctx, *, monster_name: str = ""):
     if not monster_name:
         await ctx.send("UwU, please specify which monster to evolve! Example: `astramon evolve Fire Pup`")
         return
@@ -312,11 +317,14 @@ async def battle(ctx, opponent: discord.Member = None):
             return
         opp_monster = random.choice(opp_data["monsters"])
         is_bot_battle = False
+        opp_name = opponent.name
+        opp_mention = opponent.mention
     else:
         # Battle against bot
         opp_monster = random.choice(random.choice(list(MONSTERS.values()))).copy()
-        opponent = bot.user
         is_bot_battle = True
+        opp_name = "Astramon Bot"
+        opp_mention = "**Astramon Bot**"
     
     # Calculate damage based on elements
     player_elements = player_monster["element"].split("|")
@@ -358,16 +366,17 @@ async def battle(ctx, opponent: discord.Member = None):
     
     # Determine winner
     if player_hp > opp_hp:
-        winner = ctx.author
         user_data["battles_won"] += 1
         reward = 150
         user_data["shards"] += reward
         result_msg = f"🎉 Victory! Your {player_monster['emoji']} **{player_monster['name']}** won!\n+{reward}💎 shards! UwU"
+        if not is_bot_battle and opponent:
+            opp_data = get_user_data(opponent.id)
+            opp_data["battles_lost"] += 1
     else:
-        winner = opponent
         user_data["battles_lost"] += 1
         result_msg = f"💔 Oh no~ Your {player_monster['emoji']} **{player_monster['name']}** lost... Better luck next time! 😢"
-        if not is_bot_battle:
+        if not is_bot_battle and opponent:
             opp_data = get_user_data(opponent.id)
             opp_data["battles_won"] += 1
             opp_data["shards"] += 150
@@ -382,7 +391,7 @@ async def battle(ctx, opponent: discord.Member = None):
     
     battle_embed = discord.Embed(
         title="⚔️ Battle Arena! ⚔️",
-        description=f"{ctx.author.mention}'s {player_monster['emoji']} **{player_monster['name']}** VS {opponent.mention}'s {opp_monster['emoji']} **{opp_monster['name']}**{advantage_text}",
+        description=f"{ctx.author.mention}'s {player_monster['emoji']} **{player_monster['name']}** VS {opp_mention}'s {opp_monster['emoji']} **{opp_monster['name']}**{advantage_text}",
         color=discord.Color.gold()
     )
     
@@ -393,7 +402,7 @@ async def battle(ctx, opponent: discord.Member = None):
     )
     
     battle_embed.add_field(
-        name=f"{opponent.name}'s Monster",
+        name=f"{opp_name}'s Monster",
         value=f"{opp_monster['emoji']} **{opp_monster['name']}**\nHP: {opp_monster['hp']} | ATK: {opp_monster['attack']}\nElement: {opp_monster['element']}",
         inline=True
     )
@@ -440,12 +449,12 @@ async def quiz(ctx):
 
 @bot.command()
 async def profile(ctx, member: discord.Member = None):
-    member = member or ctx.author
-    user_data = get_user_data(member.id)
-    await check_hunger(member.id)
+    target_member = member or ctx.author
+    user_data = get_user_data(target_member.id)
+    await check_hunger(target_member.id)
     
     embed = discord.Embed(
-        title=f"🐾 {member.name}'s Astramon Profile",
+        title=f"🐾 {target_member.name}'s Astramon Profile",
         color=discord.Color.blue()
     )
     
