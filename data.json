@@ -6,14 +6,15 @@
         "emoji": "\ud83d\udc36",
         "element": "Fire",
         "hp": 50,
-        "attack": 15,
+        "attack": 17,
         "rarity": "common",
         "last_fed": "2025-10-10T15:56:47.273230",
         "hunger": 0,
-        "alert_sent": false
+        "alert_sent": false,
+        "level": 2
       }
     ],
-    "shards": 400,
+    "shards": 300,
     "battles_won": 1,
     "battles_lost": 0,
     "last_catch": "2025-10-10T15:56:47.273241",
