@@ -27,6 +27,7 @@ Astramon is a Discord bot for collecting, battling, and caring for elemental mon
 ## Commands
 - `astramon catch` - Catch a random wild monster (30s cooldown)
 - `astramon feed <monster>` - Feed a monster (costs 50💎)
+- `astramon train <monster>` - Train a monster to increase level & attack (costs 100💎)
 - `astramon shop` - View the food shop
 - `astramon evolve <monster>` - Evolve a monster (costs 500💎)
 - `astramon battle [@user]` - Battle another user or the bot
@@ -42,7 +43,7 @@ Fire > Wind > Earth > Lightning > Water > Fire
 - Earn 50💎 per catch
 - Earn 150💎 per battle win
 - Earn 100💎 per correct quiz answer
-- Spend on feeding (50💎) and evolution (500💎)
+- Spend on feeding (50💎), training (100💎), and evolution (500💎)
 
 ### Hunger System
 - Hunger increases 10 points per hour
@@ -87,6 +88,7 @@ Phoenix Emperor (Fire|Wind), Leviathan King (Water|Earth), Storm Dragon (Lightni
 - `.gitignore` - Python and virtual environment files ignored
 
 ## Recent Changes
+- 2025-10-10: Added train feature - monsters can level up and gain attack power
 - 2025-10-10: Initial bot implementation with all core features
 - All commands tested and working
 - Persistent data storage implemented

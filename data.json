@@ -1,1 +1,23 @@
-{}
+{
+  "1355576071696810024": {
+    "monsters": [
+      {
+        "name": "Fire Pup",
+        "emoji": "\ud83d\udc36",
+        "element": "Fire",
+        "hp": 50,
+        "attack": 15,
+        "rarity": "common",
+        "last_fed": "2025-10-10T15:56:47.273230",
+        "hunger": 0,
+        "alert_sent": false
+      }
+    ],
+    "shards": 400,
+    "battles_won": 1,
+    "battles_lost": 0,
+    "last_catch": "2025-10-10T15:56:47.273241",
+    "last_daily": null,
+    "quiz_cooldown": "2025-10-10T15:58:11.543467"
+  }
+}

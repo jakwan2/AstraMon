@@ -173,6 +173,7 @@ async def catch(ctx):
     monster["last_fed"] = datetime.now().isoformat()
     monster["hunger"] = 0
     monster["alert_sent"] = False
+    monster["level"] = 1
     
     user_data["monsters"].append(monster)
     user_data["shards"] += 50
@@ -219,6 +220,43 @@ async def feed(ctx, *, monster_name: str = ""):
     await ctx.send(
         f"Yummy~ 🍖 Your {monster['emoji']} **{monster['name']}** is now full and happy! "
         f"(-{cost}💎) Remaining: {user_data['shards']}💎 💕"
+    )
+
+@bot.command()
+async def train(ctx, *, monster_name: str = ""):
+    if not monster_name:
+        await ctx.send("UwU, please specify which monster to train! Example: `astramon train Fire Pup`")
+        return
+    
+    user_data = get_user_data(ctx.author.id)
+    
+    monster = None
+    for m in user_data["monsters"]:
+        if m["name"].lower() == monster_name.lower():
+            monster = m
+            break
+    
+    if not monster:
+        await ctx.send(f"Nyaa~ You don't have a {monster_name} in your collection! 😿")
+        return
+    
+    cost = 100
+    if user_data["shards"] < cost:
+        await ctx.send(f"Oh no~ You need {cost}💎 to train! You only have {user_data['shards']}💎 😢")
+        return
+    
+    if "level" not in monster:
+        monster["level"] = 1
+    
+    monster["level"] += 1
+    monster["attack"] += 2
+    user_data["shards"] -= cost
+    save_data(data)
+    
+    await ctx.send(
+        f"✨ Training complete! Your {monster['emoji']} **{monster['name']}** leveled up!\n"
+        f"Level: **{monster['level']}** | ATK: **{monster['attack']}** (+2) 💪\n"
+        f"(-{cost}💎) Remaining: {user_data['shards']}💎 UwU~"
     )
 
 @bot.command()
@@ -465,7 +503,8 @@ async def profile(ctx, member: discord.Member = None):
         monsters_list = []
         for m in user_data["monsters"][:10]:  # Show up to 10
             hunger_bar = "🟢" if m.get("hunger", 0) < 30 else "🟡" if m.get("hunger", 0) < 70 else "🔴"
-            monsters_list.append(f"{m['emoji']} **{m['name']}** ({m['element']}) {hunger_bar}")
+            level_text = f"Lv.{m.get('level', 1)}" if m.get('level', 1) > 1 else ""
+            monsters_list.append(f"{m['emoji']} **{m['name']}** {level_text} ({m['element']}) {hunger_bar}")
         embed.add_field(
             name=f"🌟 Monsters ({len(user_data['monsters'])} total)",
             value="\n".join(monsters_list) if monsters_list else "None yet~",
@@ -494,6 +533,12 @@ async def help(ctx):
     embed.add_field(
         name="astramon feed <monster>",
         value="🍖 Feed your monster to keep it happy (costs 50💎)",
+        inline=False
+    )
+    
+    embed.add_field(
+        name="astramon train <monster>",
+        value="💪 Train your monster to increase level & attack (costs 100💎)",
         inline=False
     )
     
