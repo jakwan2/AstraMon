@@ -60,11 +60,26 @@ Inferno Wolf, Tidal Dolphin, Stonefang, Stormlynx, Thunder Drake
 Phoenix Emperor (Fire|Wind), Leviathan King (Water|Earth), Storm Dragon (Lightning|Wind), Terra Beast (Earth|Fire)
 
 ## Setup Instructions
+
+### ⚠️ CRITICAL: Discord Developer Portal Setup
+**Before running the bot, you MUST enable the Message Content Intent:**
+
+1. Go to https://discord.com/developers/applications/
+2. Select your bot application
+3. Navigate to **Bot** section → **Privileged Gateway Intents**
+4. **Enable "MESSAGE CONTENT INTENT"** toggle
+5. Click **Save Changes**
+
+### Adding Bot Token to Replit
 1. Python 3.11 and discord.py are already installed
-2. **REQUIRED**: Add your Discord bot token to Replit Secrets:
+2. Add your Discord bot token to Replit Secrets (🔒 icon):
    - Secret name: `DISCORD_BOT_TOKEN`
    - Value: Your Discord bot token from Discord Developer Portal
 3. Run the bot - it will print "Astramon is online! 🐾" when ready
+
+### Troubleshooting
+- If bot crashes with "PrivilegedIntentsRequired" error, enable Message Content Intent in Discord Portal
+- See `SETUP_INSTRUCTIONS.md` for detailed setup guide
 
 ## File Structure
 - `main.py` - Main bot code with all commands and game logic
