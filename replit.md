@@ -5,7 +5,8 @@ Astramon is a Discord bot for collecting, battling, and caring for elemental mon
 
 ## Project Status
 ✅ Core implementation complete
-⏳ Waiting for user to add DISCORD_BOT_TOKEN to Replit Secrets
+✅ 24/7 uptime system configured with Flask keep-alive server
+✅ Bot is running and ready for use
 
 ## Features Implemented
 - **Monster Catching System**: Catch random monsters with 5 elemental types (Fire 🔥, Water 💧, Earth 🌱, Wind 🌪️, Lightning ⚡)
@@ -20,9 +21,12 @@ Astramon is a Discord bot for collecting, battling, and caring for elemental mon
 
 ## Technical Stack
 - **Language**: Python 3.11
-- **Library**: discord.py 2.6.4
+- **Libraries**: 
+  - discord.py 2.6.4 (Discord bot framework)
+  - Flask 3.1.2 (Keep-alive web server for 24/7 uptime)
 - **Data Storage**: JSON file (data.json) for persistence
 - **Prefix**: `astramon ` (with space)
+- **24/7 Uptime**: Flask web server on port 5000 for UptimeRobot monitoring
 
 ## Commands
 - `astramon catch` - Catch a random wild monster (30s cooldown)
@@ -78,6 +82,20 @@ Phoenix Emperor (Fire|Wind), Leviathan King (Water|Earth), Storm Dragon (Lightni
    - Value: Your Discord bot token from Discord Developer Portal
 3. Run the bot - it will print "Astramon is online! 🐾" when ready
 
+### 24/7 Uptime Setup (Optional)
+The bot includes a Flask web server on port 5000 for keep-alive monitoring:
+
+1. **Get Your Replit URL**: Copy the webview URL (e.g., `https://yourproject.yourname.repl.co`)
+2. **Set Up UptimeRobot** (free service):
+   - Go to https://uptimerobot.com and create a free account
+   - Create a new monitor:
+     - Monitor Type: HTTP(s)
+     - URL: Your Replit webview URL
+     - Monitoring Interval: 5 minutes
+   - This will ping your bot every 5 minutes to keep it alive 24/7
+
+The Flask server responds with "Astramon bot is running 24/7!" when accessed.
+
 ### Troubleshooting
 - If bot crashes with "PrivilegedIntentsRequired" error, enable Message Content Intent in Discord Portal
 - See `SETUP_INSTRUCTIONS.md` for detailed setup guide
@@ -88,6 +106,8 @@ Phoenix Emperor (Fire|Wind), Leviathan King (Water|Earth), Storm Dragon (Lightni
 - `.gitignore` - Python and virtual environment files ignored
 
 ## Recent Changes
+- 2025-10-11: Added Flask keep-alive web server for 24/7 uptime support
+- 2025-10-11: Configured multi-threading to run Discord bot and web server simultaneously
 - 2025-10-10: Added train feature - monsters can level up and gain attack power
 - 2025-10-10: Initial bot implementation with all core features
 - All commands tested and working

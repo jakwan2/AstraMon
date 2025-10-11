@@ -5,6 +5,8 @@ import random
 import os
 from datetime import datetime, timedelta
 import asyncio
+from flask import Flask
+from threading import Thread
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -587,6 +589,19 @@ async def help(ctx):
     embed.set_footer(text="Nyaa~ Have fun collecting monsters! Remember to feed them regularly! 💕")
     await ctx.send(embed=embed)
 
+# Flask keep-alive web server (for 24/7 uptime)
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Astramon bot is running 24/7!"
+
+def run_web_server():
+    import logging
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+    app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+
 # Run the bot
 if __name__ == "__main__":
     token = os.getenv("DISCORD_BOT_TOKEN")
@@ -594,4 +609,11 @@ if __name__ == "__main__":
         print("❌ Error: DISCORD_BOT_TOKEN not found in environment variables!")
         print("Please add your Discord bot token to Replit Secrets.")
     else:
+        # Start the Flask web server in a separate thread
+        web_thread = Thread(target=run_web_server)
+        web_thread.daemon = True
+        web_thread.start()
+        print("✅ Keep-alive server running on port 5000!")
+        
+        # Run the Discord bot (this blocks until the bot stops)
         bot.run(token)
