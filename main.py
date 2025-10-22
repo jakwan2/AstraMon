@@ -7,11 +7,16 @@ from datetime import datetime, timedelta
 import asyncio
 from flask import Flask
 from threading import Thread
+from google import genai
+from google.genai import types
 
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="astramon ", intents=intents, help_command=None)
+
+# Gemini AI client for quiz generation
+gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 # Monster database with elements
 MONSTERS = {
@@ -79,6 +84,45 @@ ELEMENT_ADVANTAGES = {
     "Wind": "Earth",
     "Lightning": "Water"
 }
+
+# Random anime emojis for quiz fun
+ANIME_EMOJIS = ["📺", "🎌", "⚔️", "🔥", "✨", "💫", "🌟", "🎭", "🎪", "🌸"]
+
+# AI-powered quiz generation using Gemini
+def generate_anime_quiz():
+    try:
+        prompt = """Generate a random anime trivia question with 4 multiple choice options.
+Return ONLY a valid JSON object with this exact format (no markdown, no backticks):
+{
+  "question": "the question text",
+  "options": {
+    "A": "first option",
+    "B": "second option", 
+    "C": "third option",
+    "D": "fourth option"
+  },
+  "correct": "A",
+  "explanation": "brief explanation"
+}
+
+Make the question fun and about popular anime (Naruto, One Piece, Attack on Titan, My Hero Academia, Demon Slayer, Dragon Ball, Death Note, etc.)"""
+
+        response = gemini_client.models.generate_content(
+            model="gemini-2.0-flash-exp",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json"
+            )
+        )
+        
+        if response.text:
+            quiz_data = json.loads(response.text)
+            return quiz_data
+        else:
+            return None
+    except Exception as e:
+        print(f"Error generating quiz: {e}")
+        return None
 
 # Load or create data
 def load_data():
@@ -786,25 +830,94 @@ async def quiz(ctx):
             await ctx.send(f"Nyaa~ Please wait {remaining} seconds before the next quiz! 📚")
             return
     
-    question = random.choice(ANIME_QUIZ)
+    await ctx.send("🔮 Generating a fresh anime question for you... UwU ✨")
     
-    await ctx.send(f"📺 **Anime Quiz Time!** 📺\n{question['question']}\n\nYou have 15 seconds to answer! UwU")
+    quiz_data = generate_anime_quiz()
+    
+    if not quiz_data:
+        fallback = random.choice(ANIME_QUIZ)
+        await ctx.send(f"📺 **Anime Quiz Time!** 📺\n{fallback['question']}\n\nYou have 15 seconds to answer! UwU")
+        
+        user_data["quiz_cooldown"] = datetime.now().isoformat()
+        save_data(data)
+        
+        def check_fallback(m):
+            return m.author == ctx.author and m.channel == ctx.channel
+        
+        try:
+            msg = await bot.wait_for('message', check=check_fallback, timeout=15.0)
+            
+            if msg.content.lower().strip() in fallback["answer"].lower():
+                user_data["shards"] += fallback["reward"]
+                save_data(data)
+                await ctx.send(f"✨ Correct! You earned {fallback['reward']}💎! Amazing~ 🎉\nYou now have {user_data['shards']}💎")
+            else:
+                await ctx.send(f"Oh no~ That's not quite right! The answer was: **{fallback['answer']}** 😅")
+        except asyncio.TimeoutError:
+            await ctx.send(f"Time's up~ The answer was: **{fallback['answer']}** ⏰")
+        return
+    
+    anime_emoji = random.choice(ANIME_EMOJIS)
+    
+    embed = discord.Embed(
+        title=f"{anime_emoji} AI-Powered Anime Quiz! {anime_emoji}",
+        description=quiz_data["question"],
+        color=discord.Color.purple()
+    )
+    
+    options_text = ""
+    for letter, option in quiz_data["options"].items():
+        options_text += f"\n**{letter}**. {option}"
+    
+    embed.add_field(
+        name="Choose your answer (A, B, C, or D):",
+        value=options_text,
+        inline=False
+    )
+    
+    embed.set_footer(text="You have 20 seconds to answer! Nyaa~ 💫")
+    
+    await ctx.send(embed=embed)
+    
+    user_data["quiz_cooldown"] = datetime.now().isoformat()
+    save_data(data)
     
     def check(m):
-        return m.author == ctx.author and m.channel == ctx.channel
+        return m.author == ctx.author and m.channel == ctx.channel and m.content.upper().strip() in ["A", "B", "C", "D"]
     
     try:
-        msg = await bot.wait_for('message', check=check, timeout=15.0)
+        msg = await bot.wait_for('message', check=check, timeout=20.0)
+        user_answer = msg.content.upper().strip()
         
-        if msg.content.lower().strip() in question["answer"].lower():
-            user_data["shards"] += question["reward"]
-            user_data["quiz_cooldown"] = datetime.now().isoformat()
+        if user_answer == quiz_data["correct"]:
+            reward = 150
+            user_data["shards"] += reward
             save_data(data)
-            await ctx.send(f"✨ Correct! You earned {question['reward']}💎! Amazing~ 🎉\nYou now have {user_data['shards']}💎")
+            
+            await ctx.send(
+                f"✨ **Correct!** ✨\n"
+                f"You earned **{reward}💎**! Amazing knowledge~ 🎉\n"
+                f"{quiz_data.get('explanation', '')} UwU\n"
+                f"Your balance: **{user_data['shards']}💎**"
+            )
         else:
-            await ctx.send(f"Oh no~ That's not quite right! The answer was: **{question['answer']}** 😅")
+            correct_answer = quiz_data["correct"]
+            correct_text = quiz_data["options"][correct_answer]
+            
+            await ctx.send(
+                f"Aww~ Not quite right! 😅\n"
+                f"The correct answer was **{correct_answer}**: {correct_text}\n"
+                f"{quiz_data.get('explanation', '')} Better luck next time, nyaa~ 💕"
+            )
     except asyncio.TimeoutError:
-        await ctx.send(f"Time's up~ The answer was: **{question['answer']}** ⏰")
+        correct_answer = quiz_data["correct"]
+        correct_text = quiz_data["options"][correct_answer]
+        
+        await ctx.send(
+            f"⏰ Time's up! ⏰\n"
+            f"The correct answer was **{correct_answer}**: {correct_text}\n"
+            f"Try to be faster next time~ UwU ✨"
+        )
 
 @bot.command()
 async def profile(ctx, member: discord.Member = None):

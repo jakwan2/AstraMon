@@ -1,6 +1,7 @@
 modules = ["python-3.11"]
 [agent]
 expertMode = true
+integrations = ["python_gemini:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
@@ -30,6 +31,10 @@ waitForPort = 5000
 [[ports]]
 localPort = 5000
 externalPort = 5000
+
+[[ports]]
+localPort = 34757
+externalPort = 3000
 
 [[ports]]
 localPort = 39311
