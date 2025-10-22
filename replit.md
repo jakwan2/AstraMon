@@ -11,13 +11,19 @@ Astramon is a Discord bot for collecting, battling, and caring for elemental mon
 ## Features Implemented
 - **Monster Catching System**: Catch random monsters with 5 elemental types (Fire 🔥, Water 💧, Earth 🌱, Wind 🌪️, Lightning ⚡)
 - **Rarity System**: Common (75%), Rare (20%), Legendary (5%) with dual-element legendaries
-- **Feeding & Hunger**: Monsters get hungry over time, send DM alerts when starving, die if neglected
-- **Shop System**: Purchase food items with shards (in-game currency)
+- **Monster Stacking**: Duplicate monsters are automatically stacked together with count tracking
+- **Feeding & Hunger**: Monsters get hungry over time, send DM alerts when starving
+- **Shop System**: Purchase food items and manage inventory with shards (in-game currency)
+- **Inventory System**: Buy items from shop and track your purchases
+- **Sell System**: Sell monsters for shards (pricing based on rarity and level)
+- **Team System**: Create battle teams with up to 6 monsters for strategic gameplay
+- **Team Status**: View detailed status of your team including hunger levels
 - **Evolution System**: Evolve common monsters into rare forms for 500 shards
-- **Battle System**: PvP or battle bot with elemental advantage mechanics
+- **Battle System**: PvP or battle bot using your team monsters with elemental advantage mechanics
+- **Training System**: Level up monsters to increase attack power
 - **Anime Quiz**: Answer trivia for shard rewards with 5-minute cooldown
-- **Profile Command**: View monster collection, stats, and shards
-- **Help Command**: Display all commands with descriptions
+- **Profile Command**: View monster collection, stats, and shards with team indicators
+- **Help Command**: Display all commands with organized categories
 
 ## Technical Stack
 - **Language**: Python 3.11
@@ -29,15 +35,31 @@ Astramon is a Discord bot for collecting, battling, and caring for elemental mon
 - **24/7 Uptime**: Flask web server on port 5000 for UptimeRobot monitoring
 
 ## Commands
+
+### Core Commands
 - `astramon catch` - Catch a random wild monster (30s cooldown)
 - `astramon feed <monster>` - Feed a monster (costs 50💎)
 - `astramon train <monster>` - Train a monster to increase level & attack (costs 100💎)
-- `astramon shop` - View the food shop
 - `astramon evolve <monster>` - Evolve a monster (costs 500💎)
-- `astramon battle [@user]` - Battle another user or the bot
-- `astramon quiz` - Answer anime trivia for rewards (5min cooldown)
+
+### Team & Battle Commands
+- `astramon team` - View your battle team
+- `astramon team add <monster>` - Add monster to your team (max 6)
+- `astramon team remove <monster>` - Remove monster from team
+- `astramon team clear` - Clear entire team
+- `astramon teamstatus` - View detailed team status with hunger levels
+- `astramon battle [@user]` - Battle another user or the bot (uses team monsters)
+
+### Shop & Economy Commands
+- `astramon shop` - View the food shop with prices
+- `astramon buy <item>` - Purchase items from shop
+- `astramon inventory` - View your purchased items
+- `astramon sell <monster>` - Sell monster for shards (based on rarity & level)
+
+### Info & Other Commands
 - `astramon profile [@user]` - View monster collection and stats
-- `astramon help` - Display help message
+- `astramon quiz` - Answer anime trivia for rewards (5min cooldown)
+- `astramon help` - Display help message with all commands
 
 ## Game Mechanics
 ### Elements & Advantages
@@ -106,14 +128,21 @@ The Flask server responds with "Astramon bot is running 24/7!" when accessed.
 - `.gitignore` - Python and virtual environment files ignored
 
 ## Recent Changes
+- 2025-10-22: **Major Update - Team & Economy Systems**
+  - Added team system with ability to create battle teams (up to 6 monsters)
+  - Implemented monster stacking for duplicate catches
+  - Added sell command to sell monsters for shards (prices based on rarity & level)
+  - Enhanced shop system with buy functionality and inventory management
+  - Added teamstatus command showing detailed hunger levels and stats
+  - Updated battle system to prioritize team monsters over random selection
+  - Improved UI formatting across all commands with better embeds
+  - Renamed help command function to avoid conflicts
+  - Enhanced profile command to show team membership with ⭐ indicator
+  - Added inventory tracking for purchased shop items
 - 2025-10-11: Added Flask keep-alive web server for 24/7 uptime support
 - 2025-10-11: Configured multi-threading to run Discord bot and web server simultaneously
 - 2025-10-10: Added train feature - monsters can level up and gain attack power
 - 2025-10-10: Initial bot implementation with all core features
-- All commands tested and working
-- Persistent data storage implemented
-- Hunger system with DM alerts functional
-- Battle system with elemental advantages working
 
 ## User Preferences
 - Owo-style cute messaging (Nyaa~, UwU, etc.)
