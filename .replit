@@ -4,6 +4,7 @@ expertMode = true
 
 [nix]
 channel = "stable-25_05"
+packages = ["openssl", "postgresql"]
 
 [workflows]
 runButton = "Project"
@@ -15,23 +16,29 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Astramon Bot"
+args = "Start application"
 
 [[workflows.workflow]]
-name = "Astramon Bot"
+name = "Start application"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py"
-
-[workflows.workflow.metadata]
-outputType = "console"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
+waitForPort = 5000
 
 [[ports]]
 localPort = 5000
 externalPort = 5000
 
 [[ports]]
+localPort = 38579
+externalPort = 3000
+
+[[ports]]
 localPort = 39311
 externalPort = 80
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
