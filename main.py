@@ -16,7 +16,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="astramon ", intents=intents, help_command=None)
 
 # Gemini AI client for quiz generation
-gemini_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+gemini_api_key = os.environ.get("GEMINI_API_KEY")
+gemini_client = genai.Client(api_key=gemini_api_key) if gemini_api_key else None
 
 # Monster database with elements
 MONSTERS = {
@@ -90,6 +91,9 @@ ANIME_EMOJIS = ["📺", "🎌", "⚔️", "🔥", "✨", "💫", "🌟", "🎭",
 
 # AI-powered quiz generation using Gemini
 def generate_anime_quiz():
+    if not gemini_client:
+        return None
+    
     try:
         prompt = """Generate a random anime trivia question with 4 multiple choice options.
 Return ONLY a valid JSON object with this exact format (no markdown, no backticks):
